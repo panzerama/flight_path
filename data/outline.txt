@@ -1,0 +1,33 @@
+Small plane path calculator
+
+1. Create an airport data structure that accomodates the designator, the long name, the airport location (city,state)
+   and the geocoded value.
+2. Graph data structure
+3. Load into the Graph all the airports as vertices
+4. For each vertex v
+    For all neighbors u
+        if Edge v, u does not exist
+            calculate distance with google maps api and airport geolocations
+5. Interface: given two airports, find the most advantageous flight path, prioritizing major hubs
+
+Calculating optimum flight path
+Range of aircraft is the limiting factor
+
+Edge weight is based on three things:
+    Distance: the optimum flight distance is 3/4 the range.
+    Destination type: P-M (medium traffic) are the most advantageous, with P-S, P-N, and P-L in descending order
+
+Class Airport
+    code
+    city
+    geo-loc
+
+Class Plane
+    max range
+    get optimum range
+
+Class Graph
+    def dijkstra
+
+load in the airports
+
