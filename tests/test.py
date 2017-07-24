@@ -39,6 +39,21 @@ class TestGraph(unittest.TestCase):
         self.assertTrue(air_map.has_vertex(seattle))
 
     def test_can_add_edge(self):
-        self.fail("Finish edge test")
+        air_map = Graph()
+        houston = Airport("KIAH", "George Bush Intercontinental Airport", "P-L")
+        seattle = Airport("KSEA", "Seattle-Tacoma International", "P-L")
+
+        air_map.add_flight_path(seattle, houston)
+        self.assertAlmostEqual(air_map.get_flight_path_length(seattle, houston), 3013.28, places=2)
+
+    def test_can_find_a_path(self):
+        #load from into the graph
+        #load to into the graph
+        self.fail('implement the path searching')
+
+    def test_can_find_the_shortest_path(self):
+        #load several points
+        #assert the path returned fits shortest parameters
+        pass
 
 #todo

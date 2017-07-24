@@ -48,7 +48,7 @@ class Airport:
 class Graph:
     def __init__(self):
         self.vertices = set()
-        self.edges = defaultdict(list)
+        self.edges = {}
         self.distances = {}
 
     def add_vertex(self, vertex):
@@ -56,3 +56,25 @@ class Graph:
 
     def has_vertex(self, thing):
         return thing in self.vertices
+
+    def add_flight_path(self, origin, destination):
+        if origin not in self.edges:
+            self.edges[origin] = {}
+        self.edges[origin][destination] = origin.get_distance_to(destination)
+
+    def get_flight_path_length(self, origin, destination):
+        return self.edges[origin][destination]
+
+    def find_route(self, origin, destination, distance_limit):
+        #wrapper for dijkstra
+        pass
+
+    def dijsktra(self, initial):
+        """Return a list of nodes and distances related to the travel from initial to those nodes
+        initial -- an Airport object, the starting point
+        """
+        distance = {airport: math.inf for airport in self.vertices}
+        predecessor = {airport: None for airport in self.vertices}
+        distance[initial] = 0
+
+        #python priority queue?
