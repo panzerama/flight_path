@@ -69,7 +69,9 @@ class Graph:
         pass
 
     def dijsktra(self, start, end):
-        """Return a list of nodes and distances related to the travel from initial to those nodes
+        """
+        Adapted from: http://code.activestate.com/recipes/119466-dijkstras-algorithm-for-shortest-paths/
+        Return a list of nodes and distances related to the travel from initial to those nodes
         initial -- an Airport object, the starting point
         end -- limiting node. search ends when end is encountered in graph
         """

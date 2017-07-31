@@ -1,5 +1,6 @@
 # Priority dictionary using binary heaps
 # David Eppstein, UC Irvine, 8 Mar 2002
+# source: http://code.activestate.com/recipes/117228/
 
 from __future__ import generators
 
