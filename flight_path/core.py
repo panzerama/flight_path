@@ -3,6 +3,7 @@ import json
 from config.api_key import google_maps_api
 import math
 from collections import defaultdict
+from flight_path import PriorityDict
 
 class Airport:
     def __init__(self, code="", name="", type=""):
@@ -47,34 +48,65 @@ class Airport:
 
 class Graph:
     def __init__(self):
-        self.vertices = set()
-        self.edges = {}
-        self.distances = {}
+        self.vertices = {}
 
     def add_vertex(self, vertex):
-        self.vertices.add(vertex)
+        self.vertices[vertex] = {}
 
     def has_vertex(self, thing):
         return thing in self.vertices
 
     def add_flight_path(self, origin, destination):
-        if origin not in self.edges:
-            self.edges[origin] = {}
-        self.edges[origin][destination] = origin.get_distance_to(destination)
+        if origin not in self.vertices:
+            raise ValueError("origin is not in graph")
+        self.vertices[origin][destination] = origin.get_distance_to(destination)
 
     def get_flight_path_length(self, origin, destination):
-        return self.edges[origin][destination]
+        return self.vertices[origin][destination]
 
     def find_route(self, origin, destination, distance_limit):
         #wrapper for dijkstra
         pass
 
-    def dijsktra(self, initial):
+    def dijsktra(self, start, end):
         """Return a list of nodes and distances related to the travel from initial to those nodes
         initial -- an Airport object, the starting point
+        end -- limiting node. search ends when end is encountered in graph
         """
-        distance = {airport: math.inf for airport in self.vertices}
-        predecessor = {airport: None for airport in self.vertices}
-        distance[initial] = 0
+        D = {}  # dictionary of final distances
+        P = {}  # dictionary of predecessors
+        Q = PriorityDict()  # est.dist. of non-final vert.
+        Q[start] = 0
 
-        #python priority queue?
+        for v in Q:
+            D[v] = Q[v]
+            if v == end: break
+
+            for w in self.vertices[v]:
+                vwLength = D[v] + self.vertices[v][w]
+                if w in D:
+                    if vwLength < D[w]:
+                        raise ValueError("Dijkstra: found better path to already-final vertex")
+                elif w not in Q or vwLength < Q[w]:
+                    Q[w] = vwLength
+                    P[w] = v
+
+        return (D, P)
+
+    def shortestPath(self, start, end):
+        """
+        Find a single shortest path from the given start vertex
+        to the given end vertex.
+        The input has the same conventions as Dijkstra().
+        The output is a list of the vertices in order along
+        the shortest path.
+        """
+
+        D, P = self.dijkstra(start, end)
+        path = []
+        while 1:
+            path.append(end)
+            if end == start: break
+            end = P[end]
+        path.reverse()
+        return path
