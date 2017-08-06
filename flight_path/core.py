@@ -6,10 +6,9 @@ from collections import defaultdict
 from flight_path import PriorityDict
 
 class Airport:
-    def __init__(self, code="", name="", type=""):
+    def __init__(self, code="", name=""):
         self.code = code
         self.name = name
-        self.type = type
         if code != "":
             self.geoloc = self.set_geoloc(code)
         else:
@@ -56,12 +55,12 @@ class Graph:
     def has_vertex(self, thing):
         return thing in self.vertices
 
-    def add_flight_path(self, origin, destination):
+    def add_flight_path(self, origin, destination): #todo make get_edge
         if origin not in self.vertices:
             raise ValueError("origin is not in graph")
         self.vertices[origin][destination] = origin.get_distance_to(destination)
 
-    def get_flight_path_length(self, origin, destination):
+    def get_flight_path_length(self, origin, destination): #todo make get_weight
         return self.vertices[origin][destination]
 
     def find_route(self, origin, destination, distance_limit):
@@ -112,3 +111,5 @@ class Graph:
             end = P[end]
         path.reverse()
         return path
+
+#todo elements of the graph class are specific to the application. abstract them
