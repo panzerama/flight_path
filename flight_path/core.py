@@ -3,7 +3,7 @@ import json
 from config.api_key import google_maps_api
 import math
 from collections import defaultdict
-from flight_path import PriorityDict
+from collections import deque
 
 class Airport:
     def __init__(self, code="", name=""):
@@ -55,6 +55,12 @@ class Graph:
     def has_vertex(self, thing):
         return thing in self.vertices
 
+    def get_vertices(self):
+        return self.vertices
+
+    def get_adjacency(self, vertex):
+        return self.vertices[vertex]
+
     def add_flight_path(self, origin, destination): #todo make get_edge
         if origin not in self.vertices:
             raise ValueError("origin is not in graph")
@@ -64,52 +70,51 @@ class Graph:
         return self.vertices[origin][destination]
 
     def find_route(self, origin, destination, distance_limit):
-        #wrapper for dijkstra
-        pass
-
-    def dijsktra(self, start, end):
-        """
-        Adapted from: http://code.activestate.com/recipes/119466-dijkstras-algorithm-for-shortest-paths/
-        Return a list of nodes and distances related to the travel from initial to those nodes
-        initial -- an Airport object, the starting point
-        end -- limiting node. search ends when end is encountered in graph
-        """
-        D = {}  # dictionary of final distances
-        P = {}  # dictionary of predecessors
-        Q = PriorityDict()  # est.dist. of non-final vert.
-        Q[start] = 0
-
-        for v in Q:
-            D[v] = Q[v]
-            if v == end: break
-
-            for w in self.vertices[v]:
-                vwLength = D[v] + self.vertices[v][w]
-                if w in D:
-                    if vwLength < D[w]:
-                        raise ValueError("Dijkstra: found better path to already-final vertex")
-                elif w not in Q or vwLength < Q[w]:
-                    Q[w] = vwLength
-                    P[w] = v
-
-        return (D, P)
-
-    def shortestPath(self, start, end):
-        """
-        Find a single shortest path from the given start vertex
-        to the given end vertex.
-        The input has the same conventions as Dijkstra().
-        The output is a list of the vertices in order along
-        the shortest path.
-        """
-
-        D, P = self.dijkstra(start, end)
+        distances, predecessor = self.breadth_first_search(origin, distance_limit)
         path = []
-        while 1:
-            path.append(end)
-            if end == start: break
-            end = P[end]
-        path.reverse()
+        current = destination
+        if distances[destination] != math.inf:
+            for x in range(distances[destination]):
+                path.append(predecessor[current])
+                current = predecessor[current]
+
         return path
+
+    # Breadth first search
+    def breadth_first_search(self, starting_vertex, distance_limit):
+        # start from point start
+        # create q with s in queue
+        v_queue = deque(starting_vertex)
+
+        marked = []
+
+        # dictionary of distances from s to each vertex, set to math.inf
+        distances = {key: math.inf for key in self.vertices}
+        # dictionary of previous vertex on path from s to each vertex, each set to None
+        predecessor = {key: None for key in self.vertices}
+        distances[starting_vertex] = 0
+        predecessor.popitem(starting_vertex)
+
+        #while queue is not empty
+        while v_queue:
+            # new vertex equals queue.pop
+            vertex = v_queue.popleft()
+
+            # explore each of the neighboring vertices
+            for adjacent in self.vertices[vertex]:
+                # discarding those at a suboptimal distance
+                # or that have already been explored
+                if self.get_flight_path_length(vertex, adjacent) <= distance_limit or vertex not in marked:
+                # for every qualified neighbor
+                #     for that neighbor, set distance +1 distance vertex
+                    distances[adjacent] = distances[vertex] + 1
+                #     for that neighbor, set predecessor to vertex
+                    predecessor[adjacent] = vertex
+
+        # add vertex to marked dictionary when finished
+            marked.append(vertex)
+
+        # return the two dicts of information
+        return distances, predecessor
 
 #todo elements of the graph class are specific to the application. abstract them

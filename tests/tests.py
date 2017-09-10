@@ -1,8 +1,31 @@
 import unittest
 from flight_path.core import Airport, Graph
 #todo import google maps api
+import random
 
 class TestAirport(unittest.TestCase):
+
+    def setUp(self):
+        file_path = '../data/us-primary-airports.txt'
+        airports = open(file_path, 'r', encoding="utf-8")
+        air_map = Graph()
+
+        for line in airports:
+            airport_line = line.split(u'\t')
+            airport = Airport(airport_line[0], airport_line[1])
+            air_map.add_vertex(airport)
+
+        airports_list = []
+        airports = open(file_path, 'r', encoding="utf-8")
+
+        for line in airports:
+            part = line.split(u'\t')
+            airports_list.append(Airport(part[0], part[1]))
+
+        for airport in airports_list:
+            if air_map.has_vertex(airport):
+                air_map.add_flight_path(airport, random.choice(airports_list))
+
     def test_can_create_airport(self):
         birmingham = Airport()
         self.assertIsInstance(birmingham, Airport)
@@ -62,20 +85,28 @@ class TestGraph(unittest.TestCase):
         # assert that the path returned is the most efficient
         pass
 
-    def load_airport_info(self):
-        file_path = '../data/us-primary-airports.txt'
-        airports = open(file_path, 'r')
-        air_map = Graph()
-
-        for line in airports:
-            airport_line = line.split(r'\t')
-            air_map.add_vertex(airport_line[0], airport_line[1])
-
-    def load_flight_paths(self, air_map):
-        file_path = '../data/us-primary-airports.txt'
-        airports = open(file_path, 'r')
-
-        airports_list = [line for line in airports]
+    # @staticmethod
+    # def load_airport_info(file_path):
+    #     airports = open(file_path, 'r')
+    #     air_map = Graph()
+    #
+    #     for line in airports:
+    #         airport_line = line.split(r'\t')
+    #         airport = Airport(airport_line[0], airport_line[1])
+    #         air_map.add_vertex(airport)
+    #
+    # def load_flight_paths(self, air_map, file_path):
+    #     airports = open(file_path, 'r')
+    #     airports_list = []
+    #
+    #     for line in airports:
+    #         part = line.split(r'\t')
+    #         airports_list.append(Airport(part[0], part[1]))
+    #
+    #     for airport in airports_list:
+    #         if air_map.has_vertex(airport):
+    #             air_map.add_flight_path(airport, random.choice(airports_list))
 
 
 #todo pre and post conditions in app, test edge cases
+#todo why were helper functions not recognized in setUp?
